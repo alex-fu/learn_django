@@ -5,11 +5,11 @@ reference documents/finance_url.txt
 """
 import os
 import time
-from utils import create_path, download_file, DOWNLOADS_DIR
+from utils import create_path, download_file, FINANCE_SHEET_DIR
 
 
 def download_all_financial_data(stock_code):
-    base_path = os.path.join(DOWNLOADS_DIR, 'finance', stock_code)
+    base_path = os.path.join(FINANCE_SHEET_DIR, stock_code)
     create_path(base_path)
 
     sheet_types = {

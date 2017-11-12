@@ -5,6 +5,7 @@ from xid import Xid
 
 TOP_DIR = os.path.dirname(os.path.abspath(__file__))
 DOWNLOADS_DIR = os.path.join(TOP_DIR, 'downloads')
+FINANCE_SHEET_DIR = os.path.join(DOWNLOADS_DIR, 'finance')
 
 
 def create_path(path):
