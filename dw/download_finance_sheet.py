@@ -43,7 +43,7 @@ def download_all_financial_data(stock_code):
             for term_type in sheet_info['terms']:
                 download_file(_download_url(sheet_type, term_type, sheet_part),
                               _download_file_path(sheet_type, term_type, sheet_part))
-                time.sleep(1)
+    time.sleep(1)
 
 
 if __name__ == "__main__":
