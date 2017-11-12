@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>菜鸟教程(runoob.com)</title>
+</head>
+<body>
+
+<div id=”board">
+    <p>welcome </p>
+    <p >input: <input id="board_input"/></p>
+    <button onclick="test()">save</button>
+</div>
+<script>
+    function test() {
+        var content = document.getElementById('board_input').value;
+        console.log(content);
+        window.location.href = "1.html?content=" + content;
+    }
+</script>
+</body>
+</html>

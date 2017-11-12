@@ -1,0 +1,108 @@
+{% extends "strategy/data.html" %}
+{% block link %}
+{% endblock %}
+{% block style %}
+    table
+    {
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-right: auto;
+    margin-left: auto;
+    width: 800px;
+    }
+    th, td
+    {
+    border: 1px solid #b5d6e6;
+    font-size: 12px;
+    font-weight: normal;
+    text-align: center;
+    vertical-align: middle;
+    height: 20px;
+    }
+    th
+    {
+    background-color: Gray;
+    }
+{% endblock %}
+{% block content %}
+    <p>代码<input id="code"/>时间（单位：）<input id="nyears"/><button onclick="getData()">提交</button></p>
+{% endblock %}
+{% block script %}
+    <script>
+        function getData() {
+            $.ajax({
+                type: "POST",
+                data: {"code": document.getElementById("code").value, "nyears": document.getElementById("nyears").value},
+                url: "{% url 'li_basic' %}",
+                timeout: 60000,
+                success: function (results, msg) {
+                    var data = JSON.parse(results);
+
+                    var content = document.getElementById("content");
+                    var basicTable = document.getElementById("basicTable");
+                    if (typeof basicTable !== "undefined" && basicTable !== null) {
+                        content.removeChild(basicTable);
+                    }
+                    basicTable = document.createElement("table");
+                    basicTable.id = "basicTable";
+                    content.appendChild(basicTable);
+
+                    createTable(basicTable, data);
+                },
+                error: function (msg) {
+                    alert("oops");
+                }
+            });
+        }
+        
+        function createTable(tableElement, data) {
+            var rowTitles = data["rowTitles"];
+            var colTitles1 = data["colTitles1"];
+            var colTitles2 = data["colTitles2"];
+            var tableData = data["tableData"];
+
+            // first row
+            var tr = document.createElement("tr");
+            tableElement.appendChild(tr);
+            for (var j = 0; j < colTitles1.length + 1; j++) {
+                if (j == 0) {
+                    var td = document.createElement("td");
+                    tr.appendChild(td);
+                    td.setAttribute("rowspan", "2");
+                }else{
+                    var td = document.createElement("td");
+                    tr.appendChild(td);
+                    td.setAttribute("colspan", colTitles2.length);
+                    td.innerHTML = colTitles1[j-1];
+                }
+            }
+
+            // second row
+            var tr = document.createElement("tr");
+            tableElement.appendChild(tr);
+            for (var j = 0; j < colTitles1.length; j++) {
+                for (var m = 0; m < colTitles2.length; m++) {
+                    var td = document.createElement("td");
+                    tr.appendChild(td);
+                    td.innerHTML = colTitles2[m];
+                }
+            }
+
+            // other rows
+            for (var i = 0; i < rowTitles.length; i++) {
+                var tr = document.createElement("tr");
+                tableElement.appendChild(tr);
+                var td = document.createElement("td");
+                tr.appendChild(td);
+                td.innerHTML = rowTitles[i];
+                for (var j = 0; j < colTitles1.length; j++) {
+                    for (var m = 0; m < colTitles2.length; m++) {
+                        var td = document.createElement("td");
+                        tr.appendChild(td);
+                        td.innerHTML = tableData[colTitles1[j]][colTitles2[m]][rowTitles[i]];
+                    }
+                }
+            }
+        }
+    </script>
+{% endblock %}

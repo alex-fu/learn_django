@@ -1,0 +1,25 @@
+{% extends "strategy/base.html" %}
+{% load static %}
+{% block link %}
+{% endblock %}
+{% block style %}
+{% endblock %}
+{% block index %}
+    <div class="bs-config-sidebar sidebar" style="font-size:15px;">
+        <ul class="nav nav-sidebar">
+            <li><a id="liJie" href="{% url 'li_basic' %}" onclick="">李杰</a>
+                <ul>
+                    <li><a id="li_basic" href="{% url 'li_basic' %}" onclick="">最基本</a>
+                    </li>
+                </ul>
+            </li>
+            <li id="RobertoChen"><a href="javascript:void(0)" onclick="">RobertoChen</a>
+            </li>
+        </ul>
+    </div>
+{% endblock %}
+{% block content %}
+{% endblock %}
+{% block script %}
+{% endblock %}
+

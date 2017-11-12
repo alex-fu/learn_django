@@ -1,0 +1,35 @@
+1. 资产负债表
+http://quotes.money.163.com/service/zcfzb_300438.html?type=report （报告期 季度累加）
+http://quotes.money.163.com/service/zcfzb_300438.html?type=year
+2. 利润表
+http://quotes.money.163.com/service/lrb_300438.html?type=report
+http://quotes.money.163.com/service/lrb_300438.html?type=year
+3. 现金流量表
+http://quotes.money.163.com/service/xjllb_300438.html?type=report
+http://quotes.money.163.com/service/xjllb_300438.html?type=year
+
+4. 主要财务指标
+4.1 主要财务指标
+http://quotes.money.163.com/service/zycwzb_300438.html?type=report
+http://quotes.money.163.com/service/zycwzb_300438.html?type=year
+http://quotes.money.163.com/service/zycwzb_300438.html?type=season (单季度)
+4.2 盈利能力
+http://quotes.money.163.com/service/zycwzb_300438.html?type=report&part=ylnl
+http://quotes.money.163.com/service/zycwzb_300438.html?type=year&part=ylnl
+http://quotes.money.163.com/service/zycwzb_300438.html?type=season&part=ylnl
+4.3 偿还能力
+http://quotes.money.163.com/service/zycwzb_300438.html?type=report&part=chnl
+http://quotes.money.163.com/service/zycwzb_300438.html?type=year&part=ylnl
+http://quotes.money.163.com/service/zycwzb_300438.html?type=season&part=ylnl
+4.4 成长能力
+http://quotes.money.163.com/service/zycwzb_300438.html?type=report&part=cznl
+http://quotes.money.163.com/service/zycwzb_300438.html?type=year&part=cznl
+http://quotes.money.163.com/service/zycwzb_300438.html?type=season&part=cznl
+4.5 营运能力
+http://quotes.money.163.com/service/zycwzb_300438.html?type=report&part=yynl
+http://quotes.money.163.com/service/zycwzb_300438.html?type=year&part=yynl
+http://quotes.money.163.com/service/zycwzb_300438.html?type=season&part=yynl
+
+5. 财务报表摘要
+http://quotes.money.163.com/service/cwbbzy_300438.html?type=report
+http://quotes.money.163.com/service/cwbbzy_300438.html?type=year

@@ -1,0 +1,6 @@
+*.log
+.idea/
+*.sqlite3
+downloads/
+
+

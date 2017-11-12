@@ -1,0 +1,24 @@
+﻿{% extends "strategy/base.html" %}
+{% load static %}
+{% block content %}
+    <p>test1</p>
+    <p>test2</p>
+    <p>test3</p>
+    <p id="welcome"></p>
+{% endblock %}
+{% block script %}
+    <script>
+        $.ajax({
+            type: "GET",
+            url: "{%url 'get_data'%}",
+            timeout: 60000,
+            success: function (results, msg) {
+                var data = JSON.parse(results);
+                document.getElementById('welcome').innerHTML = data['name'];
+            },
+            error: function (msg) {
+                document.getElementById('welcome').innerHTML = 'oops';
+            }
+        });
+    </script>
+{% endblock %}

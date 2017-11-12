@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>tables</title>
+</head>
+<style type="text/css">
+table
+{
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-right: auto;
+    margin-left: auto;
+    width: 800px;
+ }
+ th, td
+ {
+    border: 1px solid #b5d6e6;
+    font-size: 12px;
+    font-weight: normal;
+    text-align: center;
+    vertical-align: middle;
+    height: 20px;
+ }
+ th
+ {
+    background-color: Gray;
+ }
+</style>
+
+<body>
+<input type="button" value="button" onclick="createTable(data)" />
+<table id="tab">
+</table>
+<script type="text/javascript">
+	var data = {
+		"rowtitles":["语文","数学"],
+		"coldata":[{"name":"Lucy","data":[{"year":"2010","Chinese":95,"Math":88},{"year":"2011","Chinese":55,"Math":66},{"year":"2012","Chinese":66,"Math":98}]},{"name":"Jam","data":[{"year":"2010","Chinese":95,"Math":88},{"year":"2011","Chinese":55,"Math":66},{"year":"2012","Chinese":66,"Math":98}]}]
+	}
+	function createTable(data){
+		var body = document.getElementsByTagName("body")[0];
+		//body.createElement("table");
+		var table = document.getElementById("tab");
+		//语文   数学
+		var rowtitlesLen = data.rowtitles.length;
+		//
+		var coltitlesLen = data.coldata.length;
+		//年份长度
+		var yearLen = data.coldata[0].data.length;
+
+		//第一列
+		var tr = document.createElement("tr");
+		table.appendChild(tr);
+		for (var j = 0; j < coltitlesLen + 1; j++) {
+			if (j == 0) {
+				var td = document.createElement("td");
+				tr.appendChild(td);
+				td.setAttribute("rowspan","2");
+			}else{
+				var td = document.createElement("td");
+				tr.appendChild(td);
+				td.setAttribute("colspan",yearLen);
+				td.innerHTML = data.coldata[j-1].name;
+			}
+		}
+				
+		//第二列
+		var tr = document.createElement("tr");
+		table.appendChild(tr);
+		for (var j = 0; j < coltitlesLen; j++) {
+			for (var m = 0; m < yearLen; m++) {
+					var td = document.createElement("td");
+					tr.appendChild(td);
+					td.innerHTML = data.coldata[j].data[m].year;
+				}
+		}
+
+		//后续列
+		for (var i = 0; i < rowtitlesLen; i++) {
+			var tr = document.createElement("tr");
+			table.appendChild(tr);
+			var td = document.createElement("td");
+			tr.appendChild(td);
+			td.innerHTML = data.rowtitles[i];
+			for (var j = 0; j < coltitlesLen; j++) {
+				for (var m = 0; m < yearLen; m++) {
+					var td = document.createElement("td");
+					tr.appendChild(td);
+					if (i == 0) {
+						td.innerHTML = data.coldata[j].data[m].Chinese;
+					}else{
+						td.innerHTML = data.coldata[j].data[m].Math;
+					}
+
+				}
+			}
+		}
+			
+	}
+			
+
+	//window.onload = createTable(data);
+</script>
+</body>
+</html>
