@@ -1,7 +1,7 @@
 # coding=utf-8
 
 import pandas as pd
-from dw.dw_api import parse_finance_file
+from dw.dw_api import get_finance_sheet
 
 
 def _get_row_numeric(df, row_name):
@@ -20,7 +20,7 @@ def gross_profit_rate(stock_code, date_list):
            算法：
                  毛利率 = (营业收入(万元) - 营业成本(万元)) / 营业收入(万元)
     """
-    lrb_df = parse_finance_file(stock_code, "lrb", "report")
+    lrb_df = get_finance_sheet(stock_code, "lrb", "report")
 
     income = _get_row_numeric(lrb_df[date_list], u"营业收入(万元)")
     cost = _get_row_numeric(lrb_df[date_list], u"营业成本(万元)")
@@ -46,7 +46,7 @@ def expense_rate(stock_code, date_list):
                  财务费用率 = 财务费用(万元) / 营业收入(万元)
                  三项费用率 = (销售费用(万元) + 管理费用(万元) + 财务费用(万元)) / 营业收入(万元)
     """
-    lrb_df = parse_finance_file(stock_code, "lrb", "report")
+    lrb_df = get_finance_sheet(stock_code, "lrb", "report")
 
     income = _get_row_numeric(lrb_df[date_list], u"营业收入(万元)")
     sale_expense = _get_row_numeric(lrb_df[date_list], u"销售费用(万元)")
@@ -75,7 +75,7 @@ def net_profit_rate(stock_code, date_list):
                  净利润率 = 净利润(万元) / 营业收入(万元)
                  净利润(万元) = 利润总额(万元) - 所得税费用(万元) ??
     """
-    lrb_df = parse_finance_file(stock_code, "lrb", "report")
+    lrb_df = get_finance_sheet(stock_code, "lrb", "report")
 
     net_profit = _get_row_numeric(lrb_df[date_list], u"净利润(万元)")
     income = _get_row_numeric(lrb_df[date_list], u"营业收入(万元)")

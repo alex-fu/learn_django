@@ -1,7 +1,11 @@
 SERVER_ERR_INTERNAL = 10000
+SERVER_ERR_WRONG_PARAM = 10001
+SERVER_ERR_DOWNLOAD_FAILED = 10002
 
 SERVER_ERR_DICT = {
     SERVER_ERR_INTERNAL: 'internal error',
+    SERVER_ERR_WRONG_PARAM: 'wrong param',
+    SERVER_ERR_DOWNLOAD_FAILED: 'download file from internet failed',
 }
 
 
