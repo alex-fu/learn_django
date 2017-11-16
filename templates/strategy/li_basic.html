@@ -8,7 +8,7 @@
     border-spacing: 0;
     margin-right: auto;
     margin-left: auto;
-    width: 800px;
+    width: 1000px;
     }
     th, td
     {
@@ -19,90 +19,77 @@
     vertical-align: middle;
     height: 20px;
     }
-    th
+    ths
     {
     background-color: Gray;
     }
+
+    input
+    {
+    width:200px;
+    height:20px;
+    border:1px solid Gray;
+    }
+    span
+    {
+    font-weight:bold;
+    color:#5e5e5e;
+    width:40px;
+    display:inline-block;
+    }
+{% endblock %}
+{% block header_script %}
 {% endblock %}
 {% block content %}
-    <p>代码<input id="code"/>时间（单位：）<input id="nyears"/><button onclick="getData()">提交</button></p>
+    <div id="dataQuery" style="height:40px;margin-top:10px;margin-left:40px;">
+        <span type="text">代码:</span>
+        <input id="codes" title="代码" value="300438" type="text"/>
+        <span type="text"></span>
+        <span type="text">时间:</span>
+        <input id="dates" title="时间" value="2017-09-30,2016-12-31,2015-12-31" type="text"/>
+        <span type="text"></span>
+        <button id="queryData" onclick="getData()">查询</button>
+        <a id="saveExcel" style="display:none" href="#">下载excel</a>
+        <a id="saveCsv" style="display:none" href="#">下载csv</a>
+    </div>
+    <div id="dataDisplay" style="margin-top:10px;"></div>
 {% endblock %}
 {% block script %}
     <script>
         function getData() {
             $.ajax({
                 type: "POST",
-                data: {"code": document.getElementById("code").value, "nyears": document.getElementById("nyears").value},
-                url: "{% url 'li_basic' %}",
-                timeout: 60000,
-                success: function (results, msg) {
-                    var data = JSON.parse(results);
-
-                    var content = document.getElementById("content");
-                    var basicTable = document.getElementById("basicTable");
-                    if (typeof basicTable !== "undefined" && basicTable !== null) {
-                        content.removeChild(basicTable);
-                    }
-                    basicTable = document.createElement("table");
-                    basicTable.id = "basicTable";
-                    content.appendChild(basicTable);
-
-                    createTable(basicTable, data);
+                data: {
+                    "codes": $("#codes").val(),
+                    "dates": $("#dates").val(),
                 },
-                error: function (msg) {
-                    alert("oops");
+                url: "{% url 'li_basic' %}",
+                timeout: 2000,
+                success: function (result) {
+                    var saveExcelObj = document.getElementById("saveExcel");
+                    var saveCsvObj = document.getElementById("saveCsv");
+                    var data = JSON.parse(result);
+                    var download_url = "{% url 'file_download' %}";
+
+                    document.getElementById("dataDisplay").innerHTML = data["table_data"];
+                    $("[rowspan]").click(function () {
+                        newWindow.call(this);
+                    });
+
+                    saveExcelObj.setAttribute("style", "");
+                    saveExcelObj.setAttribute("href", download_url + "?uuid=" + data["uuid"] + "&type=xls");
+                    saveCsvObj.setAttribute("style", "");
+                    saveCsvObj.setAttribute("href", download_url + "?uuid=" + data["uuid"] + "&type=csv");
+                },
+                error: function (xhr) {
+                    alert("获取信息失败: " + xhr.statusText + ", details: " + xhr.status);
                 }
             });
         }
-        
-        function createTable(tableElement, data) {
-            var rowTitles = data["rowTitles"];
-            var colTitles1 = data["colTitles1"];
-            var colTitles2 = data["colTitles2"];
-            var tableData = data["tableData"];
 
-            // first row
-            var tr = document.createElement("tr");
-            tableElement.appendChild(tr);
-            for (var j = 0; j < colTitles1.length + 1; j++) {
-                if (j == 0) {
-                    var td = document.createElement("td");
-                    tr.appendChild(td);
-                    td.setAttribute("rowspan", "2");
-                }else{
-                    var td = document.createElement("td");
-                    tr.appendChild(td);
-                    td.setAttribute("colspan", colTitles2.length);
-                    td.innerHTML = colTitles1[j-1];
-                }
-            }
-
-            // second row
-            var tr = document.createElement("tr");
-            tableElement.appendChild(tr);
-            for (var j = 0; j < colTitles1.length; j++) {
-                for (var m = 0; m < colTitles2.length; m++) {
-                    var td = document.createElement("td");
-                    tr.appendChild(td);
-                    td.innerHTML = colTitles2[m];
-                }
-            }
-
-            // other rows
-            for (var i = 0; i < rowTitles.length; i++) {
-                var tr = document.createElement("tr");
-                tableElement.appendChild(tr);
-                var td = document.createElement("td");
-                tr.appendChild(td);
-                td.innerHTML = rowTitles[i];
-                for (var j = 0; j < colTitles1.length; j++) {
-                    for (var m = 0; m < colTitles2.length; m++) {
-                        var td = document.createElement("td");
-                        tr.appendChild(td);
-                        td.innerHTML = tableData[colTitles1[j]][colTitles2[m]][rowTitles[i]];
-                    }
-                }
-            }
+        function newWindow() {
+            debugger;
+            alert(this.textContent);
         }
     </script>
 {% endblock %}

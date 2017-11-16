@@ -12,6 +12,7 @@ from error import *
 TOP_DIR = os.path.dirname(os.path.abspath(__file__))
 DOWNLOADS_DIR = os.path.join(TOP_DIR, 'downloads')
 FINANCE_SHEET_DIR = os.path.join(DOWNLOADS_DIR, 'finance')
+TMP_DIR = os.path.join(TOP_DIR, 'tmp')
 
 
 def create_directory(directory_path):
@@ -117,3 +118,7 @@ def df_get_row_numeric(df, row_name, raise_e=True):
 
 def df_get_col_numeric(df, col_name, raise_e=True):
     return pd.to_numeric(df_get_col(df, col_name, raise_e), errors='coerce', downcast='float')
+
+
+def df_concat(df_list, df_name_list):
+    return pd.concat(df_list, keys=df_name_list)

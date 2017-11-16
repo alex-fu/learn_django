@@ -15,6 +15,10 @@
     </style>
     <script type="text/javascript" src="{% static 'jquery/jquery-3.2.0.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'thirdparty/FileSaver.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'thirdparty/tableexport.min.js' %}"></script>
+    {% block header_script %}
+    {% endblock %}
 </head>
 <body class="body_fix">
     <div id="header" class="navbar navbar-default navbar-fixed-top" role="navigation"
