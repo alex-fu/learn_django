@@ -65,3 +65,16 @@ def rpc_lijie_basic(request, arg_dict):
     else:
         logger.info('{} successfully.'.format(content))
         return ret
+
+
+@jsonrpc_method('strategy.rpc_financial_indicator_import')
+def rpc_financial_indicator_import(request):
+    content = 'request rpc_financial_indicator_import()'
+    logger.info(content)
+    try:
+        ret = rpchandler.rpc_financial_indicator_import()
+    except Exception, e:
+        raise_exception(request, e, content)
+    else:
+        logger.info('{} successfully.'.format(content))
+        return ret

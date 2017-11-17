@@ -41,18 +41,20 @@
 {% block header_script %}
 {% endblock %}
 {% block content %}
-    <div id="dataQuery" style="height:40px;margin-top:10px;margin-left:40px;">
-        <span type="text">代码:</span>
-        <input id="codes" title="代码" value="300438" type="text"/>
-        <span type="text"></span>
-        <span type="text">时间:</span>
-        <input id="dates" title="时间" value="2017-09-30,2016-12-31,2015-12-31" type="text"/>
-        <span type="text"></span>
-        <button id="queryData" onclick="getData()">查询</button>
-        <a id="saveExcel" style="display:none" href="#">下载excel</a>
-        <a id="saveCsv" style="display:none" href="#">下载csv</a>
+    <div class="bs-config-sidebar sidebar" style="font-size:15px;">
+        <ul class="nav nav-sidebar">
+            <li><a id="financialData" href="{% url 'strategy_financial_data' %}" onclick="">财务数据</a>
+                <ul>
+                    <li><a id="queryData" href="{% url 'strategy_financial_data' %}" onclick="">查询数据</a>
+                    </li>
+                    <li><a id="queryData" href="{% url 'strategy_financial_add' %}" onclick="">添加策略</a>
+                    </li>
+                </ul>
+            </li>
+            <li id="RobertoChen"><a href="javascript:void(0)" onclick="">RobertoChen</a>
+            </li>
+        </ul>
     </div>
-    <div id="dataDisplay" style="margin-top:10px;"></div>
 {% endblock %}
 {% block script %}
     <script>
@@ -63,7 +65,7 @@
                     "codes": $("#codes").val(),
                     "dates": $("#dates").val(),
                 },
-                url: "{% url 'li_basic' %}",
+                url: "{% url 'strategy_financial_data' %}",
                 timeout: 2000,
                 success: function (result) {
                     var saveExcelObj = document.getElementById("saveExcel");

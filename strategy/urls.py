@@ -5,11 +5,12 @@ import data
 
 
 urlpatterns = [
-    url(r'^$', download.index, name="homepage"),
+    url(r'^$', data.financial_data, name="strategy_homepage"),
 
-    url(r'^download/$', download.index, name="download"),
-    url(r'^get_data/$', download.get_data, name="get_data"),
+    # url(r'^download/$', download.index, name="strategy_download"),
+    # url(r'^download_get_data/$', download.get_data, name="strategy_download_get_data"),
 
-    url(r'^data/$', data.li_basic, name="data"),
-    url(r'^li_basic/$', data.li_basic, name="li_basic"),
+    url(r'^data/$', data.financial_data, name="strategy_data"),
+    url(r'^financial_data/$', data.financial_data, name="strategy_financial_data"),
+    url(r'^financial_add/$', data.financial_data, name="strategy_financial_add"),
 ]

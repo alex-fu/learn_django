@@ -6,13 +6,17 @@ import pandas as pd
 import numpy as np
 from decimal import Decimal
 import codecs
+import json
 
 from error import *
 
 TOP_DIR = os.path.dirname(os.path.abspath(__file__))
+TMP_DIR = os.path.join(TOP_DIR, 'tmp')
+STATIC_DIR = os.path.join(TOP_DIR, 'static')
+CONFIG_DIR = os.path.join(STATIC_DIR, 'config')
+
 DOWNLOADS_DIR = os.path.join(TOP_DIR, 'downloads')
 FINANCE_SHEET_DIR = os.path.join(DOWNLOADS_DIR, 'finance')
-TMP_DIR = os.path.join(TOP_DIR, 'tmp')
 
 
 def create_directory(directory_path):
@@ -22,6 +26,11 @@ def create_directory(directory_path):
 
 def get_uuid():
     return Xid().string()
+
+
+def json_file_to_dict(file_path, encoding='utf-8'):
+    with open(file_path, 'rb') as f:
+        return json.load(f, encoding=encoding)
 
 
 def download_csv(url, file_path, download_encoding='gbk', file_encoding='utf-8', n_tries=3):
@@ -122,3 +131,4 @@ def df_get_col_numeric(df, col_name, raise_e=True):
 
 def df_concat(df_list, df_name_list):
     return pd.concat(df_list, keys=df_name_list)
+

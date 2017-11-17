@@ -26,32 +26,7 @@ class FinanceIndicator(object):
         self.lrb = df_get_cols(self.lrb_a, date_list, raise_e=False)
         self.xjllb = df_get_cols(self.xjllb_a, date_list, raise_e=False)
         self.date_list = date_list
-
-    def _check_algorithm(self, algorithm_name, read_value, compute_value, given_date_list=None, deviation=0.01):
-        if given_date_list is None:
-            given_date_list = self.date_list
-        for date in given_date_list:
-            e = ServerException(SERVER_ERR_INTERNAL,
-                                'wrong {}: read_value[{}], compute_value[{}]'
-                                .format(algorithm_name, read_value, compute_value))
-            if df_numeric_is_nan(read_value[date]):
-                continue
-            elif df_numeric_is_nan(compute_value[date]):
-                raise e
-            else:
-                diff = np.abs(compute_value[date] - compute_value[date])
-                if diff >= deviation:
-                    raise e
-
-    def _get_term_start(self):
-        return ['{}-12-31'.format(int(date.split('-')[0]) - 1) for date in self.date_list]
-
-    def _get_term_last_year(self):
-        new_date_list = []
-        for date in self.date_list:
-            y, m, d = date.split('-')
-            new_date_list.append('{}-{}-{}'.format(int(y) - 1, m, d))
-        return new_date_list
+        # self._to_json()
 
     def main_business_income(self, given_date_list=None):
         if given_date_list is None:
@@ -120,51 +95,51 @@ class FinanceIndicator(object):
         read_value = df_get_row_numeric(self.ylnl, u'销售毛利率(%)')
         compute_value = (1 - df_get_row_numeric(self.lrb, u'营业成本(万元)') / self.main_business_income()) * 100
         self._check_algorithm('gross_profit_rate', read_value, compute_value)
-        compute_value.name = read_value.name
+        compute_value.name = FinanceIndicator._customized_indicators_name_dict['gross_profit_rate']
         return compute_value
 
     def net_profit_rate(self):
         read_value = df_get_row_numeric(self.ylnl, u'销售净利率(%)')
         compute_value = self.net_profit() / self.main_business_income() * 100
         self._check_algorithm('net_profit_rate', read_value, compute_value)
-        compute_value.name = read_value.name
+        compute_value.name = FinanceIndicator._customized_indicators_name_dict['net_profit_rate']
         return compute_value
 
-    def three_expense_rate(self):
+    def three_expenses_ratio(self):
         read_value = df_get_row_numeric(self.ylnl, u'三项费用比重(%)')
         compute_value = (df_get_row_numeric(self.lrb, u'销售费用(万元)') + df_get_row_numeric(self.lrb, u'管理费用(万元)')
                          + df_get_row_numeric(self.lrb, u'财务费用(万元)')) / self.main_business_income() * 100
         self._check_algorithm('three_expense_rate', read_value, compute_value)
-        compute_value.name = read_value.name
+        compute_value.name = FinanceIndicator._customized_indicators_name_dict['three_expenses_ratio']
         return compute_value
 
-    def sales_expenses_rate(self):
+    def sales_expenses_ratio(self):
         compute_value = df_get_row_numeric(self.lrb, u'销售费用(万元)') / self.main_business_income() * 100
-        compute_value.name = u'销售费用比重(%)'
+        compute_value.name = FinanceIndicator._customized_indicators_name_dict['sales_expenses_ratio']
         return compute_value
 
-    def administrative_expenses_rate(self):
+    def administrative_expenses_ratio(self):
         compute_value = df_get_row_numeric(self.lrb, u'管理费用(万元)') / self.main_business_income() * 100
-        compute_value.name = u'管理费用比重(%)'
+        compute_value.name = FinanceIndicator._customized_indicators_name_dict['administrative_expenses_ratio']
         return compute_value
 
-    def financial_expenses_rate(self):
+    def financial_expenses_ratio(self):
         compute_value = df_get_row_numeric(self.lrb, u'财务费用(万元)') / self.main_business_income() * 100
-        compute_value.name = u'财务费用比重(%)'
+        compute_value.name = FinanceIndicator._customized_indicators_name_dict['financial_expenses_ratio']
         return compute_value
 
     def assets_liabilities_ratio(self):
         read_value = df_get_row_numeric(self.chnl, u'资产负债率(%)')
         compute_value = df_get_row_numeric(self.zcfzb, u'负债合计(万元)') / df_get_row_numeric(self.zcfzb, u'资产总计(万元)') * 100
         self._check_algorithm('assets_liabilities_ratio', read_value, compute_value)
-        compute_value.name = read_value.name
+        compute_value.name = FinanceIndicator._customized_indicators_name_dict['assets_liabilities_ratio']
         return compute_value
 
     def roe(self):
         read_value = df_get_row_numeric(self.ylnl, u'净资产收益率(%)')
         compute_value = self.parent_company_net_profit() / self.parent_company_shareholders_equity() * 100
         self._check_algorithm('roe', read_value, compute_value)
-        compute_value.name = read_value.name
+        compute_value.name = FinanceIndicator._customized_indicators_name_dict['roe']
         return compute_value
 
     def total_assets_turnover_ratio(self):
@@ -178,14 +153,14 @@ class FinanceIndicator(object):
         term_avg = (term_start + term_end) / 2
         compute_value = self.main_business_income() / term_avg
         self._check_algorithm('total_assets_turnover_ratio', read_value, compute_value)
-        compute_value.name = read_value.name
+        compute_value.name = FinanceIndicator._customized_indicators_name_dict['total_assets_turnover_ratio']
         return compute_value
 
-    def cffo_net_profit_rate(self):
+    def cffo_net_profit_ratio(self):
         read_value = df_get_row_numeric(self.yynl, u'经营现金净流量与净利润的比率(%)')
         compute_value = df_get_row_numeric(self.xjllb, u'经营活动产生的现金流量净额(万元)') / self.net_profit()
         self._check_algorithm('cffo_net_profit_rate', read_value, compute_value)
-        compute_value.name = u'经营现金净流量与净利润的比率'
+        compute_value.name = FinanceIndicator._customized_indicators_name_dict['cffo_net_profit_ratio']
         return compute_value
 
     def major_business_income_increase_rate(self):
@@ -194,7 +169,7 @@ class FinanceIndicator(object):
         term_last_year.index = self.date_list
         compute_value = (self.main_business_income() / term_last_year - 1) * 100
         self._check_algorithm('major_business_income_increase_rate', read_value, compute_value)
-        compute_value.name = read_value.name
+        compute_value.name = FinanceIndicator._customized_indicators_name_dict['major_business_income_increase_rate']
         return compute_value
 
     def net_profit_increase_rate(self):
@@ -203,46 +178,120 @@ class FinanceIndicator(object):
         term_last_year.index = self.date_list
         compute_value = (self.net_profit() / term_last_year - 1) * 100
         self._check_algorithm('net_profit_increase_rate', read_value, compute_value)
-        compute_value.name = read_value.name
+        compute_value.name = FinanceIndicator._customized_indicators_name_dict['net_profit_increase_rate']
         return compute_value
 
     def net_profit_exclude_increase_rate(self):
         term_last_year = self.net_profit_exclude(self._get_term_last_year())
         term_last_year.index = self.date_list
         compute_value = (self.net_profit_exclude() / term_last_year - 1) * 100
-        compute_value.name = u'净利润(扣除非经常性损益后)增长率(%)'
+        compute_value.name = FinanceIndicator._customized_indicators_name_dict['net_profit_exclude_increase_rate']
         return compute_value
+
+    def get_indicator(self, indicator_type, indicator_name):
+        if indicator_type == u'主要财务指标':
+            return df_get_row_numeric(self.zycwzb, indicator_name)
+        elif indicator_type == u'盈利能力':
+            return df_get_row_numeric(self.ylnl, indicator_name)
+        elif indicator_type == u'成长能力':
+            return df_get_row_numeric(self.cznl, indicator_name)
+        elif indicator_type == u'偿还能力':
+            return df_get_row_numeric(self.chnl, indicator_name)
+        elif indicator_type == u'营运能力':
+            return df_get_row_numeric(self.yynl, indicator_name)
+        elif indicator_type == u'财务报表摘要':
+            return df_get_row_numeric(self.cwbbzy, indicator_name)
+        elif indicator_type == u'资产负债表':
+            return df_get_row_numeric(self.zcfzb, indicator_name)
+        elif indicator_type == u'利润表':
+            return df_get_row_numeric(self.lrb, indicator_name)
+        elif indicator_type == u'现金流量表':
+            return df_get_row_numeric(self.xjllb, indicator_name)
+        elif indicator_type == u'其它':
+            if indicator_name not in FinanceIndicator._customized_indicators:
+                raise ServerException(SERVER_ERR_WRONG_PARAM,
+                                      'unknown customized indicator: {}'.format(indicator_name))
+            func = FinanceIndicator._customized_indicators[indicator_name]
+            return func(self)
+        else:
+            raise ServerException(SERVER_ERR_WRONG_PARAM,
+                                  'unknown indicator: {} - {}'.format(indicator_type, indicator_name))
+
+    @staticmethod
+    def all_indicators_dict():
+        return FinanceIndicator._all_indicators
+
+    @staticmethod
+    def all_indicators_json():
+        return FinanceIndicator._all_indicators_json
+
+    def _to_json(self):
+        indicator_dict = {
+            u'主要财务指标': [indicator for indicator in self.zycwzb.index],
+            u'盈利能力': [indicator for indicator in self.ylnl.index],
+            u'成长能力': [indicator for indicator in self.cznl.index],
+            u'偿还能力': [indicator for indicator in self.chnl.index],
+            u'营运能力': [indicator for indicator in self.yynl.index],
+            u'财务报表摘要': [indicator for indicator in self.cwbbzy.index],
+            u'资产负债表': [indicator for indicator in self.zcfzb.index],
+            u'利润表': [indicator for indicator in self.lrb.index],
+            u'现金流量表': [indicator for indicator in self.xjllb.index],
+        }
+        with codecs.open(FinanceIndicator._fi_json_file, 'w', encoding='utf-8') as f:
+            json.dump(indicator_dict, f, ensure_ascii=False)
+
+    def _check_algorithm(self, algorithm_name, read_value, compute_value, given_date_list=None, deviation=0.01):
+        if given_date_list is None:
+            given_date_list = self.date_list
+        for date in given_date_list:
+            e = ServerException(SERVER_ERR_INTERNAL,
+                                'wrong {}: read_value[{}], compute_value[{}]'
+                                .format(algorithm_name, read_value, compute_value))
+            if df_numeric_is_nan(read_value[date]):
+                continue
+            elif df_numeric_is_nan(compute_value[date]):
+                raise e
+            else:
+                diff = np.abs(compute_value[date] - compute_value[date])
+                if diff >= deviation:
+                    raise e
+
+    def _get_term_start(self):
+        return ['{}-12-31'.format(int(date.split('-')[0]) - 1) for date in self.date_list]
+
+    def _get_term_last_year(self):
+        new_date_list = []
+        for date in self.date_list:
+            y, m, d = date.split('-')
+            new_date_list.append('{}-{}-{}'.format(int(y) - 1, m, d))
+        return new_date_list
+
+    _fi_json_file = os.path.join(CONFIG_DIR, 'fi.json')
+    _basic_indicators = json_file_to_dict(os.path.join(CONFIG_DIR, 'fi.json'))
+    _customized_indicators = {
+        u'销售毛利率(%)': gross_profit_rate,
+        u'销售净利率(%)': net_profit_rate,
+        u'三项费用比重(%)': three_expenses_ratio,
+        u'销售费用比重(%)': sales_expenses_ratio,
+        u'财务费用比重(%)': financial_expenses_ratio,
+        u'管理费用比重(%)': administrative_expenses_ratio,
+        u'资产负债率(%)': assets_liabilities_ratio,
+        u'净资产收益率(%)': roe,
+        u'总资产周转率(次)': total_assets_turnover_ratio,
+        u'经营现金净流量与净利润的比率': cffo_net_profit_ratio,
+        u'主营业务收入增长率(%)': major_business_income_increase_rate,
+        u'净利润增长率(%)': net_profit_increase_rate,
+        u'净利润(扣除非经常性损益后)增长率(%)': net_profit_exclude_increase_rate,
+    }
+    _all_indicators = dict(_basic_indicators, **{u'其它': _customized_indicators.keys()})
+    _all_indicators_json = json.dumps(_all_indicators, ensure_ascii=False)
+
+    _customized_indicators_name_dict = {func.__name__: name for name, func in _customized_indicators.items()}
 
 
 if __name__ == '__main__':
-    # fi = FinanceIndicator('300438', ['2017-09-30', '2016-12-31', '2015-12-31', '2014-12-31'])
-    fi = FinanceIndicator('600276', ['2017-09-30', '2017-06-30', '2017-03-31', '2016-12-31', '2015-12-31', '2014-12-31', '2013-12-31', '2012-12-31'])
-    # print fi.gross_profit_rate()
-    # print fi.net_profit_rate()
-    # print fi.three_expense_rate()
-    # print fi.sales_expenses_rate()
-    # print fi.financial_expenses_rate()
-    # print fi.administrative_expenses_rate()
-    # print fi.assets_liabilities_ratio()
-    # print fi.roe()
-    # print fi.total_assets_turnover_ratio()
-    # print fi.cffo_net_profit_rate()
-    # print fi.major_business_income_increase_rate()
-    # print fi.net_profit_exclude_increase_rate()
-
-    # pd.set_option("precision", 2)
-    pd.set_option('display.float_format', lambda x: '%.3f' % x)
-    print series_list_to_df_as_row([fi.gross_profit_rate(),
-                                    fi.net_profit_rate(),
-                                    fi.three_expense_rate(),
-                                    fi.sales_expenses_rate(),
-                                    fi.financial_expenses_rate(),
-                                    fi.administrative_expenses_rate(),
-                                    fi.assets_liabilities_ratio(),
-                                    fi.total_asset(),
-                                    fi.roe(),
-                                    fi.total_assets_turnover_ratio(),
-                                    fi.cffo_net_profit_rate(),
-                                    fi.major_business_income_increase_rate(),
-                                    fi.net_profit_exclude_increase_rate()
-                                    ])
+    fi = FinanceIndicator('300438', ['2017-09-30', '2016-12-31', '2015-12-31', '2014-12-31'])
+    # print fi.get_indicator(u'盈利能力', u'净资产收益率(%)')
+    # print fi.get_indicator(u'其它', u'销售费用比重(%)')
+    print FinanceIndicator.all_indicators_dict()
+    print u'其它' in FinanceIndicator.all_indicators_dict()
