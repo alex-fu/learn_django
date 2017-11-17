@@ -26,7 +26,7 @@ class FinanceIndicator(object):
         self.lrb = df_get_cols(self.lrb_a, date_list, raise_e=False)
         self.xjllb = df_get_cols(self.xjllb_a, date_list, raise_e=False)
         self.date_list = date_list
-        # self._to_json()
+        self._to_json()
 
     def main_business_income(self, given_date_list=None):
         if given_date_list is None:
