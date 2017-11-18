@@ -41,27 +41,46 @@
 {% block header_script %}
 {% endblock %}
 {% block content %}
-    <div id="dataQuery" style="height:40px;margin-top:10px;margin-left:40px;">
+    <div id="queryDiv" style="height:40px;margin-top:10px;margin-left:40px;">
         <span type="text">代码:</span>
         <input id="codes" title="代码" value="300438" type="text"/>
         <span type="text"></span>
         <span type="text">时间:</span>
         <input id="dates" title="时间" value="2017-09-30,2016-12-31,2015-12-31" type="text"/>
+        <span type="text">策略:</span>
+        <select id="strategySelect" title="财务策略" style="width:200px;" onchange="" data-strategies="{{ all_strategies }}">
+            <option value="">请选择财务策略</option>
+        </select>
         <span type="text"></span>
         <button id="queryData" onclick="getData()">查询</button>
         <a id="saveExcel" style="display:none" href="#">下载excel</a>
         <a id="saveCsv" style="display:none" href="#">下载csv</a>
     </div>
-    <div id="dataDisplay" style="margin-top:10px;"></div>
+    <div id="dataDisplayDiv" style="margin-top:10px;"></div>
 {% endblock %}
 {% block script %}
     <script>
+        $(document).ready(function () {
+            var strategySelectObj = document.getElementById("strategySelect");
+            var allStrategiesJson = strategySelectObj.getAttribute("data-strategies");
+            var allStrategies = JSON.parse(allStrategiesJson);
+            for (var strategy in allStrategies) {
+                if (allStrategies.hasOwnProperty(strategy)) {
+                    var optionObj = document.createElement("option");
+                    optionObj.setAttribute("value", strategy);
+                    optionObj.textContent = allStrategies[strategy];
+                    strategySelectObj.appendChild(optionObj);
+                }
+            }
+        });
+
         function getData() {
             $.ajax({
                 type: "POST",
                 data: {
                     "codes": $("#codes").val(),
                     "dates": $("#dates").val(),
+                    "strategy": $("#strategySelect").val()
                 },
                 url: "{% url 'strategy_financial_data' %}",
                 timeout: 2000,
@@ -71,7 +90,7 @@
                     var data = JSON.parse(result);
                     var download_url = "{% url 'file_download' %}";
 
-                    document.getElementById("dataDisplay").innerHTML = data["table_data"];
+                    document.getElementById("dataDisplayDiv").innerHTML = data["table_data"];
                     $("[rowspan]").click(function () {
                         newWindow.call(this);
                     });

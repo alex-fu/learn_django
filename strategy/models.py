@@ -33,13 +33,24 @@ class FinancialIndicatorModel(models.Model):
 
     @staticmethod
     def financial_indicator_list_to_id_string(indicator_list, delimiter=','):
-        indicators = {(indicator_o.indicator_name, indicator_o.indicator_type): indicator_o.id
+        indicators = {(indicator_o.indicator_type, indicator_o.indicator_name): indicator_o.id
                       for indicator_o in FinancialIndicatorModel.financial_indicator_get_all_objects()}
         try:
-            return delimiter.join([indicators[indicator] for indicator in indicator_list])
+            indicator_id_set = set([indicators[indicator] for indicator in indicator_list])
+            return delimiter.join([str(indicator_id) for indicator_id in indicator_id_set])
         except Exception, e:
             raise ServerException(SERVER_ERR_WRONG_PARAM,
                                   'wrong indicator.{}'.format(exception_string(e)))
+
+    @staticmethod
+    def financial_indicator_id_to_list(indicator_id_str, delimiter=','):
+        indicators = {indicator_o.id: (indicator_o.indicator_type, indicator_o.indicator_name)
+                      for indicator_o in FinancialIndicatorModel.financial_indicator_get_all_objects()}
+        try:
+            return [indicators[int(indicator_id)] for indicator_id in indicator_id_str.split(delimiter)]
+        except Exception, e:
+            raise ServerException(SERVER_ERR_WRONG_PARAM,
+                                  'wrong indicator id.{}'.format(exception_string(e)))
 
 
 class FinancialStrategyModel(models.Model):

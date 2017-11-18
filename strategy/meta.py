@@ -57,6 +57,18 @@ class ModelsRequest:
     def financial_strategy_copy(strategy_name, old_strategy_id):
         return ModelsRequest._request(_financial_strategy_copy, args=(strategy_name, old_strategy_id,))
 
+    @staticmethod
+    def financial_strategy_get_object(strategy_id):
+        return ModelsRequest._request(_financial_strategy_get_object, args=(strategy_id,))
+
+    @staticmethod
+    def financial_strategy_get_all_objects():
+        return ModelsRequest._request(_financial_strategy_get_all_objects, args=())
+
+    @staticmethod
+    def financial_strategy_query_objects(query_info):
+        return ModelsRequest._request(_financial_strategy_query_objects, args=(query_info,))
+
 
 ########################################################################################################################
 # financial indicator operations
@@ -143,3 +155,22 @@ def _financial_strategy_copy(strategy_name, old_strategy_id):
     except IntegrityError, e:
         raise ServerException(SERVER_ERR_FI_ALREADY_EXIST, exception_string(e))
     return new_strategy_o
+
+
+@transaction.atomic
+def _financial_strategy_get_object(strategy_id):
+    from models import FinancialStrategyModel, FinancialIndicatorModel
+    strategy_o = FinancialStrategyModel.financial_strategy_get_object(strategy_id)
+    return FinancialIndicatorModel.financial_indicator_id_to_list(strategy_o.indicators)
+
+
+@transaction.atomic
+def _financial_strategy_get_all_objects():
+    from models import FinancialStrategyModel
+    return FinancialStrategyModel.financial_strategy_get_all_objects()
+
+
+@transaction.atomic
+def _financial_strategy_query_objects(query_info):
+    from models import FinancialStrategyModel
+    return FinancialStrategyModel.financial_strategy_query_objects(query_info)

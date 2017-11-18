@@ -39,6 +39,31 @@ def rpc_lijie_basic(arg_dict):
     return uuid, ret_df.to_html(float_format='%.3f')
 
 
+def rpc_financial_get_data(arg_dict):
+    try:
+        codes = arg_dict['codes'].strip()
+        dates = arg_dict['dates'].strip()
+        strategy_id = int(arg_dict['strategy_id'])
+    except Exception, e:
+        raise ServerException(SERVER_ERR_WRONG_PARAM, exception_string(e))
+
+    indicator_list = ModelsRequest.financial_strategy_get_object(strategy_id)
+
+    def _strategy_df(fi):
+        col_series_list = [fi.get_indicator(indicator_type, indicator_name)
+                           for indicator_type, indicator_name in indicator_list]
+        return series_list_to_df_as_row(col_series_list).transpose()
+
+    code_list = [code.strip() for code in codes.strip().split(',') if code.strip() != '']
+    date_list = [date.strip() for date in dates.strip().split(',') if date.strip() != '']
+    df_list = [_strategy_df(FinanceIndicator(code, date_list)) for code in code_list]
+    ret_df = df_concat(df_list, code_list)
+    uuid = get_uuid()
+    ret_df.to_csv(os.path.join(TMP_DIR, '{}.csv'.format(uuid)), encoding='gbk', float_format='%.3f')
+    ret_df.to_excel(os.path.join(TMP_DIR, '{}.xls'.format(uuid)), encoding='gbk', float_format='%.3f')
+    return uuid, ret_df.to_html(float_format='%.3f')
+
+
 def rpc_financial_indicator_import():
     indicators = FinanceIndicator.all_indicators_dict()
     print indicators
@@ -46,6 +71,9 @@ def rpc_financial_indicator_import():
 
 
 def rpc_financial_strategy_add(strategy_name, indicator_list):
+    if len(strategy_name) == 0 or len(indicator_list) == 0:
+        raise ServerException(SERVER_ERR_WRONG_PARAM)
+
     strategy_o = ModelsRequest.financial_strategy_add(strategy_name, indicator_list)
     return strategy_o.id
 

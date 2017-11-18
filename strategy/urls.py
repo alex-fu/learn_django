@@ -12,5 +12,5 @@ urlpatterns = [
 
     url(r'^data/$', data.financial_data, name="strategy_data"),
     url(r'^financial_data/$', data.financial_data, name="strategy_financial_data"),
-    url(r'^financial_add/$', data.financial_data, name="strategy_financial_add"),
+    url(r'^financial_add/$', data.financial_strategy_add, name="strategy_financial_add"),
 ]
