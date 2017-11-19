@@ -17,6 +17,7 @@ CONFIG_DIR = os.path.join(STATIC_DIR, 'config')
 
 DOWNLOADS_DIR = os.path.join(TOP_DIR, 'downloads')
 FINANCE_SHEET_DIR = os.path.join(DOWNLOADS_DIR, 'finance')
+REPORT_DIR = os.path.join(DOWNLOADS_DIR, 'report')
 
 
 def create_directory(directory_path):
@@ -129,6 +130,9 @@ def df_get_col_numeric(df, col_name, raise_e=True):
     return pd.to_numeric(df_get_col(df, col_name, raise_e), errors='coerce', downcast='float')
 
 
-def df_concat(df_list, df_name_list):
-    return pd.concat(df_list, keys=df_name_list)
+def df_concat(df_list, df_name_list=None):
+    if df_name_list is not None:
+        return pd.concat(df_list, keys=df_name_list)
+    else:
+        return pd.concat(df_list)
 
