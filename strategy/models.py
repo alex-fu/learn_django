@@ -36,8 +36,14 @@ class FinancialIndicatorModel(models.Model):
         indicators = {(indicator_o.indicator_type, indicator_o.indicator_name): indicator_o.id
                       for indicator_o in FinancialIndicatorModel.financial_indicator_get_all_objects()}
         try:
-            indicator_id_set = set([indicators[indicator] for indicator in indicator_list])
-            return delimiter.join([str(indicator_id) for indicator_id in indicator_id_set])
+            indicator_id_list = [indicators[indicator] for indicator in indicator_list]
+            indicator_id_unique_list = []
+            indicator_id_set = set()
+            for indicator_id in indicator_id_list:
+                if indicator_id not in indicator_id_set:
+                    indicator_id_unique_list.append(indicator_id)
+                    indicator_id_set.add(indicator_id)
+            return delimiter.join([str(indicator_id) for indicator_id in indicator_id_unique_list])
         except Exception, e:
             raise ServerException(SERVER_ERR_WRONG_PARAM,
                                   'wrong indicator.{}'.format(exception_string(e)))

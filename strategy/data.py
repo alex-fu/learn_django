@@ -60,3 +60,45 @@ def financial_strategy_add(request):
         print response['errmsg']
 
     return HttpResponse(json.dumps(response, ensure_ascii=False))
+
+
+def financial_strategy_update(request):
+    response = {}
+    try:
+        if request.method == 'POST':
+            strategy_id = request.POST.get('strategyId')
+            operation = request.POST.get('operation')
+            if operation == 'show':
+                # get strategy info
+                response['indicators'] = [indicator_type + '_' + indicator_name for indicator_type, indicator_name
+                                          in ModelsRequest.financial_strategy_get_object(strategy_id)]
+            elif operation == 'delete':
+                # delete strategy
+                rpcserver.rpc_financial_strategy_delete(None, strategy_id)
+            elif operation == 'copy':
+                # copy strategy
+                new_strategy_name = request.POST.get('newStrategyName')
+                rpcserver.rpc_financial_strategy_copy(None, new_strategy_name, strategy_id)
+            elif operation == 'update':
+                # update strategy
+                indicators = request.POST.get('indicatorList')
+                indicator_list = [tuple(indicator.split('_')) for indicator in indicators.split(',')]
+                rpcserver.rpc_financial_strategy_update(None, strategy_id, indicator_list)
+            else:
+                raise ServerException(SERVER_ERR_INTERNAL, 'unknown operation: {}'.format(operation))
+            return HttpResponse(json.dumps(response, ensure_ascii=False))
+        else:
+            all_strategies_o = ModelsRequest.financial_strategy_get_all_objects()
+            all_strategies_dict = {strategy_o.id: strategy_o.strategy_name for strategy_o in all_strategies_o}
+            context = {'all_indicators_json': FinanceIndicator.all_indicators_json(),
+                       'all_strategies': json.dumps(all_strategies_dict, ensure_ascii=False)}
+            return render(request, 'strategy/strategy_update.html', context)
+    except ServerException, e:
+        response['errcode'] = e.err_code
+        response['errmsg'] = e.err_msg
+    except Exception, e:
+        response['errcode'] = SERVER_ERR_INTERNAL
+        response['errmsg'] = exception_string(e)
+        print response['errmsg']
+
+    return HttpResponse(json.dumps(response, ensure_ascii=False))

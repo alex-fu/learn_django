@@ -58,6 +58,10 @@ class ModelsRequest:
         return ModelsRequest._request(_financial_strategy_copy, args=(strategy_name, old_strategy_id,))
 
     @staticmethod
+    def financial_strategy_delete(strategy_id):
+        return ModelsRequest._request(_financial_strategy_delete, args=(strategy_id,))
+
+    @staticmethod
     def financial_strategy_get_object(strategy_id):
         return ModelsRequest._request(_financial_strategy_get_object, args=(strategy_id,))
 
@@ -155,6 +159,13 @@ def _financial_strategy_copy(strategy_name, old_strategy_id):
     except IntegrityError, e:
         raise ServerException(SERVER_ERR_FI_ALREADY_EXIST, exception_string(e))
     return new_strategy_o
+
+
+@transaction.atomic
+def _financial_strategy_delete(strategy_id):
+    from models import FinancialStrategyModel
+    strategy_o = FinancialStrategyModel.financial_strategy_get_object(strategy_id)
+    strategy_o.delete()
 
 
 @transaction.atomic

@@ -1,0 +1,336 @@
+{% extends "strategy/data.html" %}
+{% block link %}
+{% endblock %}
+{% block style %}
+    table
+    {
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-right: auto;
+    margin-left: auto;
+    width: 1000px;
+    }
+    th, td
+    {
+    border: 1px solid #b5d6e6;
+    font-size: 12px;
+    font-weight: normal;
+    text-align: center;
+    vertical-align: middle;
+    height: 20px;
+    }
+    ths
+    {
+    background-color: Gray;
+    }
+
+    span
+    {
+    font-weight:bold;
+    color:#5e5e5e;
+    width:300px;
+    display:inline-block;
+    }
+    .btn-primary {
+    color: #000000;
+    background-color: #ffffff;
+    border-color: #2e6da4;
+    height: 30px;
+    width: 60px;
+    }
+{% endblock %}
+{% block header_script %}
+{% endblock %}
+{% block content %}
+    <div id="selectIndicatorDiv" style="margin-top:10px;margin-left:40px;">
+        <span type="text" style="width:100px;">财务策略:</span>
+        <select id="strategySelect" title="财务策略" style="width:200px;" onchange="showStrategyIndicators.call(this)" data-strategies="{{ all_strategies }}">
+            <option value="">请选择财务策略</option>
+        </select>
+        <button id="" class="btn btn-primary" onclick="strategyDelete()">删除</button>
+        <span type="text" style="width:100px;">新策略名称:</span>
+        <input id="newStrategyName" title="新财务策略的名称" value="" type="text"/>
+        <button id="" class="btn btn-primary" onclick="strategyCopy()">复制</button>
+        <br/>
+        <span type="text">财务指标策略(组合)</span>
+        <br/><br/>
+        <button id="addIndicatorButton" class="btn btn-primary" data-toggle="modal" data-target="#addIndicatorModal">添加</button>
+{#        <button id="deleteIndicatorButton" class="btn btn-primary" onclick="">删除</button>#}
+        <table border="1" id="indicatorTable" style="margin-top:10px;">
+            <thead id="indicatorTableHeader">
+            <tr style="text-align: right;">
+                <th>财务指标类别</th>
+                <th>财务指标名称</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="indicatorTableBody">
+{#            <tr>#}
+{#                <td>b</td>#}
+{#                <td>12</td>#}
+{#                <td><a href="#" onclick="up(this)">上移</a> <a href="#" onclick="down(this)">下移</a></td>#}
+{#            </tr>#}
+            </tbody>
+        </table>
+        <br/><br/>
+        <button id="strategyAddButton" class="btn btn-primary" onclick="strategyUpdate()" style="margin-left:400px;">保存</button>
+        <p style="display:none" id="allIndicatorsJson" data-jsonContent="{{ all_indicators_json }}"></p>
+        <a href="#" onclick="upTr(this)" style="display: none">上移</a>
+        <a href="#" onclick="downTr(this)" style="display: none">下移</a>
+        <a href="#" onclick="deleteTr(this)" style="display: none">删除</a>
+    </div>
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="addIndicatorModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" style="width:1000px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        添加财务指标
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <span style="width:100px;">财务指标类别</span>
+                    <select id="indicatorType" title="财务指标类别" style="width:200px;" onchange="showIndicatorsCheckBox.call(this)">
+                        <option value="">请选择财务指标类别</option>
+                    </select>
+                    <br/>
+                    <span style="width:100px;">财务指标名称</span>
+                    <form id="indicatorName">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">关闭
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="addCheckBoxIndicatorsToStrategy()">
+                        提交
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+    <!-- /.modal -->
+{% endblock %}
+{% block script %}
+    <script>
+        var allIndicators;
+        var indicatorTableBodyObj = document.getElementById("indicatorTableBody");
+
+        $(document).ready(function () {
+            var strategySelectObj = document.getElementById("strategySelect");
+            var allStrategiesJson = strategySelectObj.getAttribute("data-strategies");
+            var allStrategies = JSON.parse(allStrategiesJson);
+            for (var strategy in allStrategies) {
+                if (allStrategies.hasOwnProperty(strategy)) {
+                    var optionObj = document.createElement("option");
+                    optionObj.setAttribute("value", strategy);
+                    optionObj.textContent = allStrategies[strategy];
+                    strategySelectObj.appendChild(optionObj);
+                }
+            }
+
+            var allIndicatorsJsonObj = document.getElementById("allIndicatorsJson");
+            var allIndicatorsJson = allIndicatorsJsonObj.getAttribute("data-jsonContent");
+            allIndicators = JSON.parse(allIndicatorsJson);
+
+            var indicatorTypeSelectObj = document.getElementById("indicatorType");
+            for (var indicatorType in allIndicators) {
+                if (allIndicators.hasOwnProperty(indicatorType)) {
+                    var optionObj = document.createElement("option");
+                    optionObj.setAttribute("value", indicatorType);
+                    optionObj.textContent = indicatorType;
+                    indicatorTypeSelectObj.appendChild(optionObj);
+                }
+            }
+        });
+
+        function upTr(obj) {
+            var objParentTR = $(obj).parent().parent();
+            var prevTR = objParentTR.prev();
+            if (prevTR.length > 0) {
+                prevTR.insertAfter(objParentTR);
+            }
+        }
+
+        function downTr(obj) {
+            var objParentTR = $(obj).parent().parent();
+            var nextTR = objParentTR.next();
+            if (nextTR.length > 0) {
+                nextTR.insertBefore(objParentTR);
+            }
+        }
+
+        function deleteTr(obj) {
+            var objParentTR = $(obj).parent().parent();
+            objParentTR.remove();
+        }
+
+        function showIndicatorsCheckBox() {
+            debugger;
+            var indicatorNameCheckBoxObj = document.getElementById("indicatorName");
+            indicatorNameCheckBoxObj.innerHTML = "";
+            var indicatorNameList = allIndicators[this.value];
+            for (var i = 0; i < indicatorNameList.length; i++) {
+                var checkBoxObj = document.createElement("input");
+                checkBoxObj.setAttribute("type", "checkbox");
+                checkBoxObj.setAttribute("value", indicatorNameList[i]);
+                indicatorNameCheckBoxObj.appendChild(checkBoxObj);
+
+                var showTextObj = document.createElement("span");
+                showTextObj.setAttribute("style", "color: blue");
+                showTextObj.innerHTML = indicatorNameList[i];
+                indicatorNameCheckBoxObj.appendChild(showTextObj);
+
+                if (i !== 0 && i % 3 === 2) {
+                    indicatorNameCheckBoxObj.appendChild(document.createElement("br"));
+                }
+            }
+        }
+
+        function addIndicatorToStrategy(indicatorType, indicatorName) {
+            var trObj = document.createElement("tr");
+            trObj.innerHTML = "<td>" + indicatorType + "</td>" + "<td>" + indicatorName + "</td>"
+                + "<td><a href=\"#\" onclick=\"upTr(this)\">上移</a><span style=\"width:5px;\"></span>"
+                + "<a href=\"#\" onclick=\"downTr(this)\">下移</a><span style=\"width:5px;\"></span>"
+                + "<a href=\"#\" onclick=\"deleteTr(this)\">删除</a><span style=\"width:5px;\"></span></td>";
+            indicatorTableBodyObj.appendChild(trObj);
+        }
+
+        function cleanIndicatorTable() {
+            indicatorTableBodyObj.innerHTML = "";
+        }
+
+        function addCheckBoxIndicatorsToStrategy() {
+            var indicatorType = $("#indicatorType").val();
+            var indicatorName_list = [];
+            $("#indicatorName").find("input").each(function(){
+                if (this.checked) {
+                    indicatorName_list.push(this.value);
+                }
+            });
+
+{#            var indicatorTableBodyObj = document.getElementById("indicatorTableBody");#}
+            for (var i = 0; i < indicatorName_list.length; i++) {
+                addIndicatorToStrategy(indicatorType, indicatorName_list[i]);
+{#                var trObj = document.createElement("tr");#}
+{#                trObj.innerHTML = "<td>" + indicatorType + "</td>" + "<td>" + indicatorName_list[i] + "</td>"#}
+{#                    + "<td><a href=\"#\" onclick=\"upTr(this)\">上移</a><span style=\"width:5px;\"></span>"#}
+{#                    + "<a href=\"#\" onclick=\"downTr(this)\">下移</a><span style=\"width:5px;\"></span>"#}
+{#                    + "<a href=\"#\" onclick=\"deleteTr(this)\">删除</a><span style=\"width:5px;\"></span></td>";#}
+{#                indicatorTableBodyObj.appendChild(trObj);#}
+            }
+        }
+
+        function showStrategyIndicators() {
+            $.ajax({
+                type: "POST",
+                data: {
+                    "operation": "show",
+                    "strategyId": $("#strategySelect").val()
+                },
+                url: "{% url 'strategy_financial_update' %}",
+                timeout: 2000,
+                success: function (result) {
+                    var returnData = JSON.parse(result);
+                    debugger;
+                    if (typeof returnData['errcode'] !== "undefined" && returnData['errcode'] != 0) {
+                        alert('获取财务策略指标失败: errcode[' + returnData['errcode'] + '], errmsg: \n' + returnData['errmsg']);
+                    } else {
+                        cleanIndicatorTable();
+                        var indicatorList = returnData['indicators'];
+                        for (var i = 0; i < indicatorList.length; i++) {
+                            var indicatorInfoList = indicatorList[i].split('_');
+                            addIndicatorToStrategy(indicatorInfoList[0], indicatorInfoList[1]);
+                        }
+                    }
+                },
+                error: function (xhr) {
+                    alert("获取信息失败: " + xhr.statusText + ", details: " + xhr.status);
+                }
+            });
+        }
+
+        function strategyDelete() {
+            $.ajax({
+                type: "POST",
+                data: {
+                    "operation": "delete",
+                    "strategyId": $("#strategySelect").val()
+                },
+                url: "{% url 'strategy_financial_update' %}",
+                timeout: 2000,
+                success: function (result) {
+                    var returnData = JSON.parse(result);
+                    debugger;
+                    if (typeof returnData['errcode'] !== "undefined" && returnData['errcode'] != 0) {
+                        alert('获取财务策略指标失败: errcode[' + returnData['errcode'] + '], errmsg: \n' + returnData['errmsg']);
+                    } else {
+                        cleanIndicatorTable();
+                    }
+                },
+                error: function (xhr) {
+                    alert("获取信息失败: " + xhr.statusText + ", details: " + xhr.status);
+                }
+            });
+        }
+
+        function strategyCopy() {
+            $.ajax({
+                type: "POST",
+                data: {
+                    "operation": "copy",
+                    "strategyId": $("#strategySelect").val(),
+                    "newStrategyName": $("#newStrategyName").val()
+                },
+                url: "{% url 'strategy_financial_update' %}",
+                timeout: 2000,
+                success: function (result) {
+                    var returnData = JSON.parse(result);
+                    if (typeof returnData['errcode'] !== "undefined" && returnData['errcode'] != 0) {
+                        alert('获取财务策略指标失败: errcode[' + returnData['errcode'] + '], errmsg: \n' + returnData['errmsg']);
+                    }
+                },
+                error: function (xhr) {
+                    alert("获取信息失败: " + xhr.statusText + ", details: " + xhr.status);
+                }
+            });
+        }
+
+        function strategyUpdate() {
+            var strategyId = $("#strategySelect").val();
+            var indicatorList = [];
+            $("#indicatorTableBody").find("tr").each(function () {
+                indicatorList.push(this.childNodes[0].innerText + '_' + this.childNodes[1].innerText);
+            });
+            console.log(strategyId);
+            console.log(indicatorList);
+
+            $.ajax({
+                type: "POST",
+                data: {
+                    "operation": "update",
+                    "strategyId": strategyId,
+                    "indicatorList": indicatorList.join(',')
+                },
+                url: "{% url 'strategy_financial_update' %}",
+                timeout: 2000,
+                success: function (result) {
+                    var returnData = JSON.parse(result);
+                    debugger;
+                    if (typeof returnData['errcode'] !== "undefined" && returnData['errcode'] != 0) {
+                        alert('失败: errcode[' + returnData['errcode'] + '], errmsg: \n' + returnData['errmsg']);
+                    } else {
+                        alert('执行成功');
+                    }
+                },
+                error: function (xhr) {
+                    alert("获取信息失败: " + xhr.statusText + ", details: " + xhr.status);
+                }
+            });
+        }
+    </script>
+{% endblock %}

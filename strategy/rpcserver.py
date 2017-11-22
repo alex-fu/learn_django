@@ -133,3 +133,16 @@ def rpc_financial_strategy_copy(request, strategy_name, old_strategy_id):
     else:
         logger.info('{} successfully.'.format(content))
         return ret
+
+
+@jsonrpc_method('strategy.rpc_financial_strategy_delete')
+def rpc_financial_strategy_delete(request, strategy_id):
+    content = 'request rpc_financial_strategy_copy(strategy_id[{}])'.format(strategy_id)
+    logger.info(content)
+    try:
+        ret = rpchandler.rpc_financial_strategy_delete(strategy_id)
+    except Exception, e:
+        raise_exception(request, e, content)
+    else:
+        logger.info('{} successfully.'.format(content))
+        return ret

@@ -5,7 +5,7 @@ from utils import *
 
 
 class FinanceIndicator(object):
-    def __init__(self, stock_code, date_list):
+    def __init__(self, stock_code, date_list=None):
         term_type = 'report'
         self.zycwzb_a = get_finance_sheet(stock_code, 'zycwzb', term_type)
         self.ylnl_a = get_finance_sheet(stock_code, 'zycwzb', term_type, 'ylnl')
@@ -16,6 +16,8 @@ class FinanceIndicator(object):
         self.zcfzb_a = get_finance_sheet(stock_code, 'zcfzb', term_type)
         self.lrb_a = get_finance_sheet(stock_code, 'lrb', term_type)
         self.xjllb_a = get_finance_sheet(stock_code, 'xjllb', term_type)
+        if date_list is None:
+            date_list = list(self.lrb_a.columns)[:-1]
         self.zycwzb = df_get_cols(self.zycwzb_a, date_list, raise_e=False)
         self.ylnl = df_get_cols(self.ylnl_a, date_list, raise_e=False)
         self.cznl = df_get_cols(self.cznl_a, date_list, raise_e=False)
@@ -91,6 +93,9 @@ class FinanceIndicator(object):
             zcfzb = df_get_cols(self.zcfzb_a, given_date_list, raise_e=False)
         return df_get_row_numeric(zcfzb, u'资产总计(万元)').copy(deep=True)
 
+    ####################################################################################################################
+    # LiJie indicators
+    ####################################################################################################################
     def gross_profit_rate(self):
         read_value = df_get_row_numeric(self.ylnl, u'销售毛利率(%)')
         compute_value = (1 - df_get_row_numeric(self.lrb, u'营业成本(万元)') / self.main_business_income()) * 100
@@ -188,6 +193,30 @@ class FinanceIndicator(object):
         compute_value.name = FinanceIndicator._customized_indicators_name_dict['net_profit_exclude_increase_rate']
         return compute_value
 
+    ####################################################################################################################
+    # season indicators
+    ####################################################################################################################
+    def season_main_business_income(self):
+        report_value = self.main_business_income()
+        last_report_value = self.main_business_income(self._get_term_last_report())
+        season_value = self._compute_season_value(report_value, last_report_value)
+        season_value.name = FinanceIndicator._customized_indicators_name_dict['season_main_business_income']
+        return season_value
+
+    def season_net_profit(self):
+        report_value = self.net_profit()
+        last_report_value = self.net_profit(self._get_term_last_report())
+        season_value = self._compute_season_value(report_value, last_report_value)
+        season_value.name = FinanceIndicator._customized_indicators_name_dict['season_net_profit']
+        return season_value
+
+    def season_net_profit_exclude(self):
+        report_value = self.net_profit_exclude()
+        last_report_value = self.net_profit_exclude(self._get_term_last_report())
+        season_value = self._compute_season_value(report_value, last_report_value)
+        season_value.name = FinanceIndicator._customized_indicators_name_dict['season_net_profit_exclude']
+        return season_value
+
     def get_indicator(self, indicator_type, indicator_name):
         if indicator_type == u'主要财务指标':
             return df_get_row_numeric(self.zycwzb, indicator_name)
@@ -266,6 +295,29 @@ class FinanceIndicator(object):
             new_date_list.append('{}-{}-{}'.format(int(y) - 1, m, d))
         return new_date_list
 
+    def _get_term_last_report(self):
+        new_date_list = []
+        for date in self.date_list:
+            y, m, d = date.split('-')
+            if m == '12':
+                new_date_list.append('{}-{}-{}'.format(y, '09', '30'))
+            elif m == '09':
+                new_date_list.append('{}-{}-{}'.format(y, '06', '30'))
+            elif m == '06':
+                new_date_list.append('{}-{}-{}'.format(y, '03', '31'))
+            elif m == '03':
+                new_date_list.append('{}-{}-{}'.format(y, '01', '01'))
+            else:
+                raise ServerException(SERVER_ERR_WRONG_PARAM, 'date_list: {}'.format(self.date_list))
+        return new_date_list
+
+    def _compute_season_value(self, report_value, last_report_value):
+        last_report_value.index = self.date_list
+        for date in self.date_list:
+            if df_numeric_is_nan(last_report_value[date]) and not df_numeric_is_nan(report_value[date]):
+                last_report_value[date] = 0
+        return report_value - last_report_value
+
     _fi_json_file = os.path.join(CONFIG_DIR, 'fi.json')
     _basic_indicators = json_file_to_dict(os.path.join(CONFIG_DIR, 'fi.json'))
     _customized_indicators = {
@@ -282,6 +334,11 @@ class FinanceIndicator(object):
         u'主营业务收入增长率(%)': major_business_income_increase_rate,
         u'净利润增长率(%)': net_profit_increase_rate,
         u'净利润(扣除非经常性损益后)增长率(%)': net_profit_exclude_increase_rate,
+
+        # season indicators
+        u'单季主营业务收入(万元)': season_main_business_income,
+        u'单季净利润(万元)': season_net_profit,
+        u'单季净利润(扣非后)(万元)': season_net_profit_exclude,
     }
     _all_indicators = dict(_basic_indicators, **{u'其它': _customized_indicators.keys()})
     _all_indicators_json = json.dumps(_all_indicators, ensure_ascii=False)

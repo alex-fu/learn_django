@@ -29,8 +29,8 @@ def rpc_lijie_basic(arg_dict):
                            fi.net_profit_exclude_increase_rate()]
         return series_list_to_df_as_row(col_series_list).transpose()
 
-    code_list = [code.strip() for code in codes.strip().split(',') if code.strip() != '']
-    date_list = [date.strip() for date in dates.strip().split(',') if date.strip() != '']
+    code_list = [code.strip() for code in codes.split(',') if code.strip() != '']
+    date_list = [date.strip() for date in dates.split(',') if date.strip() != '']
     df_list = [_lijie_basic_df(FinanceIndicator(code, date_list)) for code in code_list]
     ret_df = df_concat(df_list, code_list)
     uuid = get_uuid()
@@ -47,6 +47,9 @@ def rpc_financial_get_data(arg_dict):
     except Exception, e:
         raise ServerException(SERVER_ERR_WRONG_PARAM, exception_string(e))
 
+    if codes == '':
+        raise ServerException(SERVER_ERR_WRONG_PARAM, 'must input codes')
+
     indicator_list = ModelsRequest.financial_strategy_get_object(strategy_id)
 
     def _strategy_df(fi):
@@ -54,8 +57,8 @@ def rpc_financial_get_data(arg_dict):
                            for indicator_type, indicator_name in indicator_list]
         return series_list_to_df_as_row(col_series_list).transpose()
 
-    code_list = [code.strip() for code in codes.strip().split(',') if code.strip() != '']
-    date_list = [date.strip() for date in dates.strip().split(',') if date.strip() != '']
+    code_list = [code.strip() for code in codes.split(',') if code.strip() != '']
+    date_list = [date.strip() for date in dates.split(',') if date.strip() != ''] if dates != '' else None
     df_list = [_strategy_df(FinanceIndicator(code, date_list)) for code in code_list]
     ret_df = df_concat(df_list, code_list)
     uuid = get_uuid()
@@ -86,3 +89,7 @@ def rpc_financial_strategy_update(strategy_id, indicator_list):
 def rpc_financial_strategy_copy(strategy_name, old_strategy_id):
     strategy_o = ModelsRequest.financial_strategy_copy(strategy_name, old_strategy_id)
     return strategy_o.id
+
+
+def rpc_financial_strategy_delete(strategy_id):
+    ModelsRequest.financial_strategy_delete(strategy_id)
