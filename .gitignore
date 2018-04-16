@@ -1,8 +1,7 @@
 *.log
 .idea/
 *.sqlite3
-downloads/
+data/
 *.pyc
 tmp/
 test/
-*.csv
