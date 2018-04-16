@@ -10,7 +10,7 @@
     <script>
         $.ajax({
             type: "GET",
-            url: "{%url 'get_data'%}",
+            url: "{%url 'strategy:get_data'%}",
             timeout: 60000,
             success: function (results, msg) {
                 var data = JSON.parse(results);

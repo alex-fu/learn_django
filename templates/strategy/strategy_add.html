@@ -208,7 +208,7 @@
                     "strategyName": strategyName,
                     "indicatorList": indicatorList.join(',')
                 },
-                url: "{% url 'strategy_financial_add' %}",
+                url: "{% url 'strategy:strategy_financial_add' %}",
                 timeout: 2000,
                 success: function (result) {
                     var returnData = JSON.parse(result);

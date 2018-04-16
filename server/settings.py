@@ -14,6 +14,8 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+META_DIR = os.path.join(BASE_DIR, 'data')
+LOG_DIR = os.path.join(BASE_DIR, 'log')
 
 
 # Quick-start development settings - unsuitable for production
@@ -37,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'strategy.apps.StrategyConfig',
+    'app_crawler',
+    # 'app_strategy',
 ]
 
 MIDDLEWARE = [
@@ -79,7 +82,7 @@ WSGI_APPLICATION = 'server.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(META_DIR, 'db.sqlite3'),
     }
 }
 
@@ -150,7 +153,19 @@ LOGGING = {
         'file_handler': {
              'level': 'INFO',
              'class': 'logging.handlers.WatchedFileHandler',
-             'filename': os.path.join(BASE_DIR, 'server.log'),
+             'filename': os.path.join(LOG_DIR, 'server.log'),
+             'formatter': 'standard'
+        },
+        'strategy_file_handler': {
+             'level': 'INFO',
+             'class': 'logging.handlers.WatchedFileHandler',
+             'filename': os.path.join(LOG_DIR, 'strategy.log'),
+             'formatter': 'standard'
+        },
+        'crawler_file_handler': {
+             'level': 'INFO',
+             'class': 'logging.handlers.WatchedFileHandler',
+             'filename': os.path.join(LOG_DIR, 'crawler.log'),
              'formatter': 'standard'
         },
         'console': {
@@ -177,7 +192,12 @@ LOGGING = {
             'propagate': False,
         },
         'strategy': {
-            'handlers': ['file_handler', 'console'],
+            'handlers': ['strategy_file_handler', 'console'],
+            'level': 'DEBUG',
+            'propagate': True
+        },
+        'crawler': {
+            'handlers': ['crawler_file_handler', 'console'],
             'level': 'DEBUG',
             'propagate': True
         },

@@ -232,7 +232,7 @@
                     "operation": "show",
                     "strategyId": $("#strategySelect").val()
                 },
-                url: "{% url 'strategy_financial_update' %}",
+                url: "{% url 'strategy:strategy_financial_update' %}",
                 timeout: 2000,
                 success: function (result) {
                     var returnData = JSON.parse(result);
@@ -261,7 +261,7 @@
                     "operation": "delete",
                     "strategyId": $("#strategySelect").val()
                 },
-                url: "{% url 'strategy_financial_update' %}",
+                url: "{% url 'strategy:strategy_financial_update' %}",
                 timeout: 2000,
                 success: function (result) {
                     var returnData = JSON.parse(result);
@@ -286,7 +286,7 @@
                     "strategyId": $("#strategySelect").val(),
                     "newStrategyName": $("#newStrategyName").val()
                 },
-                url: "{% url 'strategy_financial_update' %}",
+                url: "{% url 'strategy:strategy_financial_update' %}",
                 timeout: 2000,
                 success: function (result) {
                     var returnData = JSON.parse(result);
@@ -316,7 +316,7 @@
                     "strategyId": strategyId,
                     "indicatorList": indicatorList.join(',')
                 },
-                url: "{% url 'strategy_financial_update' %}",
+                url: "{% url 'strategy:strategy_financial_update' %}",
                 timeout: 2000,
                 success: function (result) {
                     var returnData = JSON.parse(result);

@@ -1,0 +1,13 @@
+http://www.cninfo.com.cn/search/search.jsp
+
+request example:
+    data = {
+        'orderby': 'date11',
+        'marketType': '',
+        'noticeType': '010301',
+        'stockCode': '',
+        'keyword': '',
+        'startTime': '2018-04-12',
+        'endTime': '2018-04-12',
+        'pageNo': 1
+    }

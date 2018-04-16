@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """server URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -17,14 +19,15 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from jsonrpc import jsonrpc_site
 
-import file_download
-import strategy.rpcserver
+from . import file_download
+# from app_strategy import rpcserver
+from app_crawler import rpc
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
-    url(r'^json/$', jsonrpc_site.dispatch, name="json_rpc_mount_point"),
+    url(r'^json/$', jsonrpc_site.dispatch, name="json_rpc"),
     url(r'^file_download/', file_download.file_download, name="file_download"),
 
-    url(r'^strategy/', include('strategy.urls')),
+    # url(r'^strategy/', include('app_strategy.urls', namespace='strategy')),
 ]

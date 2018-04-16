@@ -1,6 +1,8 @@
+# coding=utf-8
+
 from django.http import FileResponse
 import os
-from utils import TMP_DIR
+from common.constant import TMP_DIR
 
 
 def file_download(request):

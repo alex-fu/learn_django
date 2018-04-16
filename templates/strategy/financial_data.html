@@ -82,7 +82,7 @@
                     "dates": $("#dates").val(),
                     "strategy": $("#strategySelect").val()
                 },
-                url: "{% url 'strategy_financial_data' %}",
+                url: "{% url 'strategy:strategy_financial_data' %}",
                 timeout: 2000,
                 success: function (result) {
                     var saveExcelObj = document.getElementById("saveExcel");
